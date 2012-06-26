@@ -13,7 +13,6 @@
   ]);
 
   var move = function (event) {
-    console.log(event.keyIdentifier);
     var x = verts[0];
     var y = verts[1];
 

@@ -4,7 +4,7 @@
 // direction of bouncing.
 
 (function () {
-  var block_size = 0.1, step_size = 0.025;
+  var block_size = 0.1, step_size = 0.01;
   var xd = step_size, yd = step_size;
 
   var max_xy = 1 - block_size * 2;
