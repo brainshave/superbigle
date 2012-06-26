@@ -8,8 +8,26 @@
   <body>
     <div id="put-canvas-here"></div>
     <ul id="menu"></ul>
-    <script type="text/javascript" src="lib/_.js"></script>
-    <script type="text/javascript" src="lib/setup.js"></script>
+    <script type="text/x-c" id="lib_identity_fs">
+#ifdef GL_ES
+precision mediump float;
+#endif
+uniform vec4 vColor;
+
+void main(void) {
+  gl_FragColor = vColor;
+}
+    </script>
+    <script type="text/x-c" id="lib_identity_vs">
+attribute vec4 vVertex;
+
+void main(void) {
+  gl_Position = vVertex;
+}
+    </script>
+    <script type="text/javascript" src="lib/010_underscore.js"></script>
+    <script type="text/javascript" src="lib/020_setup.js"></script>
+    <script type="text/javascript" src="lib/030_shaders.js"></script>
     <script type="text/javascript" src="chapter_02/01_triangle.js"></script>
   </body>
 </html>
