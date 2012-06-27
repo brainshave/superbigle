@@ -4,7 +4,7 @@ cat <<EOF
 <!DOCTYPE html>
 <html>
   <head>
-    <title>WebGL Bible</title>
+    <title>WebGL SuperBigle</title>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
