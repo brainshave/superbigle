@@ -16,11 +16,11 @@
     var x = verts[0];
     var y = verts[1];
 
-    switch (event.keyIdentifier) {
-    case 'Left':  x -= step_size; break;
-    case 'Right': x += step_size; break;
-    case 'Up':    y += step_size; break;
-    case 'Down':  y -= step_size; break;
+    switch (event.keyCode) {
+    case 37: x -= step_size; break;
+    case 39: x += step_size; break;
+    case 38: y += step_size; break;
+    case 40: y -= step_size; break;
     }
 
 
@@ -65,9 +65,9 @@
   };
 
   bible.register(start, null, null, {
-    Left: move,
-    Right: move,
-    Up: move,
-    Down: move,
+    37: move,
+    38: move,
+    39: move,
+    40: move,
   });
 })();

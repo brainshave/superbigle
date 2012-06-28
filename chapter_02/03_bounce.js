@@ -19,11 +19,11 @@
   ]);
 
   var change_dir = function (event) {
-    switch (event.keyIdentifier) {
-    case 'Left':  xd = -step_size; break;
-    case 'Right': xd =  step_size; break;
-    case 'Up':    yd =  step_size; break;
-    case 'Down':  yd = -step_size; break;
+    switch (event.keyCode) {
+    case 37: xd = -step_size; break;
+    case 39: xd =  step_size; break;
+    case 38: yd =  step_size; break;
+    case 40: yd = -step_size; break;
     }
   };
 
@@ -83,9 +83,9 @@
   };
 
   bible.register(start, null, bounce, {
-    Left: change_dir,
-    Right: change_dir,
-    Up: change_dir,
-    Down: change_dir,
+    37: change_dir,
+    38: change_dir,
+    39: change_dir,
+    40: change_dir,
   });
 })();
