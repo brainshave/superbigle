@@ -3,7 +3,7 @@
 // This is modified version of Move program, so that keys change
 // direction of bouncing.
 
-(function () {
+define([ 'shaders' ], function (shaders) {
   var block_size = 0.1, step_size = 0.01;
   var xd = step_size, yd = step_size;
 
@@ -68,7 +68,7 @@
   };
 
   var start = function (gl) {
-    program = bible.create_program(gl, 'lib_identity_vs', 'lib_identity_fs');
+    program = shaders.create_program(gl, 'lib_identity_vs', 'lib_identity_fs');
     buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
@@ -86,10 +86,15 @@
     buffer = null;
   };
 
-  bible.register(start, stop, bounce, {
-    37: change_dir,
-    38: change_dir,
-    39: change_dir,
-    40: change_dir,
-  });
-})();
+  return {
+    start: start,
+    stop: stop,
+    paint: bounce,
+    keys: {
+      37: change_dir,
+      38: change_dir,
+      39: change_dir,
+      40: change_dir,
+    }
+  };
+});

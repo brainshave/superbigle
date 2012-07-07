@@ -1,42 +1,52 @@
 #!/bin/bash
 
-cat <<EOF
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>WebGL SuperBigle</title>
-    <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="style.css" />
-  </head>
-  <body>
-    <div id="put-canvas-here"></div>
-    <ul id="menu"></ul>
-EOF
-
-function each_line () {
-  while read line; do
-    $* "${line:2}"
+function each () {
+  fn=$1
+  shift
+  for file in $*; do
+    $fn "${file:2}"
   done
 }
 
-function script_src () {
-  echo '    <script type="text/javascript" src="'$1'"></script>'
+function indent () {
+  for (( i=0; i<$1; i++)); do
+    echo -n " "
+  done
 }
 
-function script_inline () {
-  id=${2/.c/}
-  id=${id/\//_}
-  echo -e '    <script type="'$1'" id="'$id'">'
-  cat $2
-  echo -e '    </script>'
+function str () {
+  indent $1
+  echo "'"$2"', "
 }
+
+files=$(find . -path "./chapter_??/*.js" | sort)
+
 
 # load shaders inline
-find . -path "./*/*.c" | sort | each_line script_inline text/x-c
-find . -path "./lib/*.js" | sort | each_line script_src
-find . -path "./chapter_??/*.js" | sort | each_line script_src
+#find . -path "./*/*.c" | sort | each_line script_inline text/x-c
+#find . -path "./lib/*.js" | sort | each_line script_src
+cat <<EOF
+define([
+EOF
+
+each 'str 2' $files
 
 cat <<EOF
-  </body>
-</html>
+], function () {
+  var names = [
+EOF
+
+each 'str 4' $files
+
+cat <<EOF
+  ];
+  var exports = {
+    names: names
+  };
+  for (var i = 0; i < arguments.length; ++i) {
+    exports[names[i]] = arguments[i];
+  }
+
+  return exports;
+});
 EOF

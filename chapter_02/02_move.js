@@ -1,6 +1,6 @@
 'use strict';
 
-(function () {
+define([ 'shaders' ], function (shaders) {
   var block_size = 0.1, step_size = 0.025;
 
   var gl, program, buffer;
@@ -50,7 +50,7 @@
 
   var start = function (gl_init) {
     gl = gl_init;
-    program = bible.create_program(gl, 'lib_identity_vs', 'lib_identity_fs');
+    program = shaders.create_program(gl, 'lib_identity_vs', 'lib_identity_fs');
     buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
@@ -70,10 +70,14 @@
     buffer = null;
   };
 
-  bible.register(start, stop, null, {
-    37: move,
-    38: move,
-    39: move,
-    40: move,
-  });
-})();
+  return {
+    start: start,
+    stop: stop,
+    keys: {
+      37: move,
+      38: move,
+      39: move,
+      40: move,
+    }
+  };
+});

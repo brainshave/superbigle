@@ -1,6 +1,6 @@
 'use strict';
 
-(function () {
+define([ 'shaders' ], function (shaders) {
   var create_triangle_buffer = function (gl) {
     var verts = new Float32Array([
      -0.5, 0,   0, 1,
@@ -15,7 +15,7 @@
   };
 
   var triangle_start = function (gl) {
-    var program = bible.create_program(gl, 'lib_identity_vs', 'lib_identity_fs');
+    var program = shaders.create_program(gl, 'lib_identity_vs', 'lib_identity_fs');
     var buffer = create_triangle_buffer(gl);
 
     gl.useProgram(program);
@@ -31,5 +31,6 @@
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 3);
   };
 
-  bible.register(triangle_start);
-})();
+
+  return { start: triangle_start };
+});
