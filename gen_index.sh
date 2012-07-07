@@ -21,10 +21,6 @@ function str () {
 
 files=$(find . -path "./chapter_??/*.js" | sort)
 
-
-# load shaders inline
-#find . -path "./*/*.c" | sort | each_line script_inline text/x-c
-#find . -path "./lib/*.js" | sort | each_line script_src
 cat <<EOF
 define([
 EOF
