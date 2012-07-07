@@ -64,7 +64,13 @@
     paint(gl);
   };
 
-  bible.register(start, null, null, {
+  var stop = function () {
+    gl = null;
+    program = null;
+    buffer = null;
+  };
+
+  bible.register(start, stop, null, {
     37: move,
     38: move,
     39: move,

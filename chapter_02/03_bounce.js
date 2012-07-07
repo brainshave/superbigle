@@ -79,10 +79,14 @@
     gl.clearColor(0.3, 0.3, 1, 1);
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-    //    paint(gl);
   };
 
-  bible.register(start, null, bounce, {
+  var stop = function () {
+    program = null;
+    buffer = null;
+  };
+
+  bible.register(start, stop, bounce, {
     37: change_dir,
     38: change_dir,
     39: change_dir,
