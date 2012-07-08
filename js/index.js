@@ -12,6 +12,7 @@ define([
     names: names
   };
   for (var i = 0; i < arguments.length; ++i) {
+    arguments[i].src = names[i];
     exports[names[i]] = arguments[i];
   }
 

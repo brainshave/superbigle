@@ -1,9 +1,13 @@
 'use strict';
 
-define([ 'shaders' ], function (shaders) {
+define([
+  'shaders',
+  'text!identity_vs.c',
+  'text!identity_fs.c',
+], function (shaders, vs_src, fs_src) {
   var block_size = 0.1, step_size = 0.025;
 
-  var gl, program, buffer;
+  var program, buffer;
 
   var verts = new Float32Array([
     -block_size, -block_size,
@@ -12,7 +16,7 @@ define([ 'shaders' ], function (shaders) {
     -block_size, block_size,
   ]);
 
-  var move = function (event) {
+  var move = function (gl, event) {
     var x = verts[0];
     var y = verts[1];
 
@@ -38,19 +42,18 @@ define([ 'shaders' ], function (shaders) {
     verts[6] = x;
     verts[7] = verts[5];
 
-    paint();
+    paint(gl);
   };
 
-  var paint = function () {
+  var paint = function (gl) {
     gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
     gl.vertexAttribPointer(program.vVertex, 2, gl.FLOAT, false, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
   };
 
-  var start = function (gl_init) {
-    gl = gl_init;
-    program = shaders.create_program(gl, 'lib_identity_vs', 'lib_identity_fs');
+  var start = function (gl) {
+    program = shaders.create_program(gl, vs_src, fs_src);
     buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
@@ -65,7 +68,6 @@ define([ 'shaders' ], function (shaders) {
   };
 
   var stop = function () {
-    gl = null;
     program = null;
     buffer = null;
   };

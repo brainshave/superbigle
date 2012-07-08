@@ -1,6 +1,10 @@
 'use strict';
 
-define([ 'shaders' ], function (shaders) {
+define([
+  'shaders',
+  'text!identity_vs.c',
+  'text!identity_fs.c',
+], function (shaders, vs_src, fs_src) {
   var create_triangle_buffer = function (gl) {
     var verts = new Float32Array([
      -0.5, 0,   0, 1,
@@ -15,7 +19,7 @@ define([ 'shaders' ], function (shaders) {
   };
 
   var triangle_start = function (gl) {
-    var program = shaders.create_program(gl, 'lib_identity_vs', 'lib_identity_fs');
+    var program = shaders.create_program(gl, vs_src, fs_src);
     var buffer = create_triangle_buffer(gl);
 
     gl.useProgram(program);

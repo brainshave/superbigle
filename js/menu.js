@@ -3,6 +3,7 @@
 define([
   'underscore',
 ], function (_) {
+  console.log(this);
   var chapter_name = /^chapter_(\d+)\/\d+_(.+)$/;
 
   var exports = {};

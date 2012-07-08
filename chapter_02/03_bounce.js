@@ -3,7 +3,11 @@
 // This is modified version of Move program, so that keys change
 // direction of bouncing.
 
-define([ 'shaders' ], function (shaders) {
+define([
+  'shaders',
+  'text!identity_vs.c',
+  'text!identity_fs.c',
+], function (shaders, vs_src, fs_src) {
   var block_size = 0.1, step_size = 0.01;
   var xd = step_size, yd = step_size;
 
@@ -68,7 +72,7 @@ define([ 'shaders' ], function (shaders) {
   };
 
   var start = function (gl) {
-    program = shaders.create_program(gl, 'lib_identity_vs', 'lib_identity_fs');
+    program = shaders.create_program(gl, vs_src, fs_src);
     buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
