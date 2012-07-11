@@ -5,13 +5,16 @@
 define(function () {
   var exports = {};
 
-  exports.frustum = function (width, height, near, far) {
-    return new Float32Array([
-      2 * near / width, 0,                 0,                                 0,
-      0,                2 * near / height, 0,                                 0,
-      0,                0,                 (far + near) / (far - near),       1,
-      0,                0,                 (- 2 * far * near) / (far - near), 0
-    ]);
+  exports.frustum = function (width, height, near, far, mat) {
+    mat = mat || new Float32Array(16);
+
+    mat[0]  = 2 * near / width;
+    mat[5]  = 2 * near / height;
+    mat[10] = (far + near) / (far - near);
+    mat[11] = 1;
+    mat[14] = (- 2 * far * near) / (far - near);
+
+    return mat;
   };
 
   exports.scale = function (x, y, z, mat) {
