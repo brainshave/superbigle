@@ -1,11 +1,12 @@
 'use strict';
 
 define([
-  'shaders',
-  'text!identity_vs.c',
-  'text!identity_fs.c',
-], function (shaders, vs_src, fs_src) {
-  var create_triangle_buffer = function (gl) {
+  'bigle/named',
+  'bigle/shaders',
+  'text!/shaders/identity_vs.c',
+  'text!/shaders/identity_fs.c',
+], function (named, shaders, vs_src, fs_src) {
+  function create_triangle_buffer (gl) {
     var verts = new Float32Array([
      -0.5, 0,   0, 1,
       0.5, 0,   0, 1,
@@ -18,7 +19,7 @@ define([
     return buffer;
   };
 
-  var triangle_start = function (gl) {
+  function start (gl) {
     var program = shaders.create_program(gl, vs_src, fs_src);
     var buffer = create_triangle_buffer(gl);
 
@@ -35,6 +36,5 @@ define([
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 3);
   };
 
-
-  return { start: triangle_start };
+  return named(start);
 });

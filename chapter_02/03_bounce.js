@@ -4,10 +4,11 @@
 // direction of bouncing.
 
 define([
-  'shaders',
-  'text!identity_vs.c',
-  'text!identity_fs.c',
-], function (shaders, vs_src, fs_src) {
+  'bigle/named',
+  'bigle/shaders',
+  'text!/shaders/identity_vs.c',
+  'text!/shaders/identity_fs.c',
+], function (named, shaders, vs_src, fs_src) {
   var block_size = 0.1, step_size = 0.01;
   var xd = step_size, yd = step_size;
 
@@ -22,7 +23,7 @@ define([
     -block_size, block_size,
   ]);
 
-  var change_dir = function (event) {
+  function change_dir (gl, event) {
     switch (event.keyCode) {
     case 37: xd = -step_size; break;
     case 39: xd =  step_size; break;
@@ -31,7 +32,7 @@ define([
     }
   };
 
-  var bounce = function (gl) {
+  function bounce () {
     var x = verts[0] + xd;
     var y = verts[1] + yd;
 
@@ -60,18 +61,18 @@ define([
     verts[5] = y + block_size * 2;
     verts[6] = x;
     verts[7] = verts[5];
-
-    paint(gl);
   };
 
-  var paint = function (gl) {
+  function paint (gl) {
+    bounce();
+
     gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
     gl.vertexAttribPointer(program.vVertex, 2, gl.FLOAT, false, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
   };
 
-  var start = function (gl) {
+  function start (gl) {
     program = shaders.create_program(gl, vs_src, fs_src);
     buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -85,20 +86,17 @@ define([
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   };
 
-  var stop = function () {
+  function stop () {
     program = null;
     buffer = null;
   };
 
-  return {
-    start: start,
-    stop: stop,
-    paint: bounce,
+  return named({
     keys: {
       37: change_dir,
       38: change_dir,
       39: change_dir,
       40: change_dir,
     }
-  };
+  }, start, stop, paint);
 });

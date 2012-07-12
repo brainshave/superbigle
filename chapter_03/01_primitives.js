@@ -1,12 +1,13 @@
 'use strict';
 
 define([
-  'shaders',
-  'matrices',
-  'text!flat_vs.c',
-  'text!identity_fs.c',
-], function (shaders, matrices, vs_src, fs_src) {
-  var create_florida_buffer = function (gl) {
+  'bigle/named',
+  'bigle/shaders',
+  'bigle/matrices',
+  'text!/shaders/flat_vs.c',
+  'text!/shaders/identity_fs.c',
+], function (named, shaders, matrices, vs_src, fs_src) {
+  function create_florida_buffer (gl) {
     // copied from Primitives.cpp
     var verts = new Float32Array([
       2.80, 1.20, 0.0 ,  2.0,  1.20, 0.0 ,
@@ -29,7 +30,7 @@ define([
     return buffer;
   };
 
-  var start = function (gl) {
+  function start (gl) {
     var program = shaders.create_program(gl, vs_src, fs_src);
     var florida = create_florida_buffer(gl);
     var p = matrices.frustum(5 * gl.drawingBufferWidth / gl.drawingBufferHeight, 5, 3, 500);
@@ -46,10 +47,9 @@ define([
     gl.vertexAttribPointer(program.vVertex, 3, gl.FLOAT, false, 0, 0);
 
     gl.uniformMatrix4fv(program.mvpMatrix, false, mvp);
-    console.log(gl.getError());
 
     gl.drawArrays(gl.LINE_LOOP, 0, 24);
   };
 
-  return { start: start };
+  return named(start);
 });

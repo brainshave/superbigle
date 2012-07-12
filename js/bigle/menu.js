@@ -5,9 +5,7 @@ define([
 ], function (_) {
   var chapter_name = /^chapter_(\d+)\/\d+_(.+)$/;
 
-  var exports = {};
-
-  var generate_empty_chapters = function () {
+  function generate_empty_chapters () {
     return _.map(_.range(16), function(i) {
       var chapter = i + 1;
 
@@ -23,7 +21,7 @@ define([
     });
   };
 
-  var put_menu_item = function (chapter_uls, script_name) {
+  function put_menu_item (chapter_uls, script_name) {
     var match = chapter_name.exec(script_name);
     var chapter = +match[1] - 1;
     var name = match[2];
@@ -36,7 +34,7 @@ define([
     chapter_uls[chapter].appendChild(li);
   }
 
-  exports.put = function (ul, script_names) {
+  function put (ul, script_names) {
     var chapter_lis = generate_empty_chapters();
     var chapter_uls = _.pluck(chapter_lis, 'scripts_ul');
 
@@ -45,5 +43,5 @@ define([
     _.each(chapter_lis, _.bind(ul.appendChild, ul));
   };
 
-  return exports;
+  return put;
 });

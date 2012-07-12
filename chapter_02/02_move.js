@@ -1,10 +1,11 @@
 'use strict';
 
 define([
-  'shaders',
-  'text!identity_vs.c',
-  'text!identity_fs.c',
-], function (shaders, vs_src, fs_src) {
+  'bigle/named',
+  'bigle/shaders',
+  'text!/shaders/identity_vs.c',
+  'text!/shaders/identity_fs.c',
+], function (named, shaders, vs_src, fs_src) {
   var block_size = 0.1, step_size = 0.025;
 
   var program, buffer;
@@ -16,7 +17,7 @@ define([
     -block_size, block_size,
   ]);
 
-  var move = function (gl, event) {
+  function move (gl, event) {
     var x = verts[0];
     var y = verts[1];
 
@@ -26,7 +27,6 @@ define([
     case 38: y += step_size; break;
     case 40: y -= step_size; break;
     }
-
 
     x = Math.max(x, -1);
     x = Math.min(x,  1 - block_size * 2);
@@ -45,14 +45,14 @@ define([
     paint(gl);
   };
 
-  var paint = function (gl) {
+  function paint (gl) {
     gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
     gl.vertexAttribPointer(program.vVertex, 2, gl.FLOAT, false, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
   };
 
-  var start = function (gl) {
+  function start (gl) {
     program = shaders.create_program(gl, vs_src, fs_src);
     buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -67,19 +67,17 @@ define([
     paint(gl);
   };
 
-  var stop = function () {
+  function stop () {
     program = null;
     buffer = null;
   };
 
-  return {
-    start: start,
-    stop: stop,
+  return named({
     keys: {
       37: move,
       38: move,
       39: move,
       40: move,
     }
-  };
+  }, start, stop);
 });

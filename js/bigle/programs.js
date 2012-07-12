@@ -2,23 +2,22 @@
 
 define([
   'underscore',
-  'utils',
-], function (_, utils) {
+  './utils',
+  './named',
+], function (_, utils, named) {
   return function (canvas_container) {
-    var exports = {};
-
     var current_program, animation, canvas, gl;
 
     var requestAnimationFrame = utils.get_prefixed_method(window, 'requestAnimationFrame');
     var cancelAnimationFrame = utils.get_prefixed_method(window, 'cancelAnimationFrame');
 
-    var animate = function () {
+    function animate () {
       current_program.paint(gl);
       animation = requestAnimationFrame(animate);
     }
 
-    exports.start = function (program) {
-      if (current_program | animation | canvas | gl) {
+    function start (program) {
+      if (current_program || animation || canvas || gl) {
         throw new Error("There's a program running: " + current_program.name);
       }
 
@@ -43,7 +42,7 @@ define([
       }
     };
 
-    exports.stop = function () {
+    function stop () {
       if (typeof animation !== 'undefined') {
         cancelAnimationFrame(animation);
         animation = undefined;
@@ -61,7 +60,7 @@ define([
       current_program = undefined;
     };
 
-    exports.handle_key = function (event) {
+    function handle_key (event) {
       var handler = current_program && current_program.keys &&
                     current_program.keys[event.keyCode];
       if (typeof handler === 'function') {
@@ -70,6 +69,6 @@ define([
       }
     };
 
-    return exports;
+    return named(start, stop, handle_key);
   };
 });

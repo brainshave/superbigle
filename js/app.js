@@ -3,11 +3,11 @@
 require([
   'underscore',
   'domReady!',
-  'index',
-  'menu',
-  'programs',
+  'bigle/index',
+  'bigle/menu',
+  'bigle/programs',
 ], function(_, document, index, menu, programs) {
-  menu.put(document.getElementById('menu'), index.names);
+  menu(document.getElementById('menu'), index.names);
 
   var program_manager = programs(document.getElementById('put-canvas-here'));
 

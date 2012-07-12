@@ -1,11 +1,18 @@
 define([
   'underscore',
+  './named',
 ], function (_) {
-  var exports = {};
+
+  var whitespace_both_sides = /^\s+|\s+$/mg;
+
+  function trim_string (str) {
+    return String.prototype.replace.call(
+      str, whitespace_both_sides, '');
+  };
 
   var browser_prefixes = [ 'webkit', 'moz', 'ms', 'o' ];
 
-  exports.get_prefixed_method = function (object, name) {
+  function get_prefixed_method (object, name) {
     var fn = object[name];
     if (typeof fn === 'function') {
       return fn;
@@ -20,5 +27,5 @@ define([
     }
   };
 
-  return exports;
+  return named(trim_string, get_prefixed_method);
 });

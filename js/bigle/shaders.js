@@ -1,9 +1,10 @@
 'use strict';
 
-define(function () {
-  var exports = {};
-
-  exports.compile_shader = function (gl, src, type) {
+define([
+  './named',
+  './utils',
+], function (named, utils) {
+  function compile_shader (gl, src, type) {
     var shader = gl.createShader(type);
     gl.shaderSource(shader, src);
     gl.compileShader(shader);
@@ -16,7 +17,7 @@ define(function () {
     }
   };
 
-  exports.link_program = function (gl, vs, fs) {
+  function link_program (gl, vs, fs) {
     var program = gl.createProgram();
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
@@ -30,25 +31,18 @@ define(function () {
     }
   };
 
-  var whitespace_both_sides = /^\s+|\s+$/mg;
-
-  exports.trim_string = function (str) {
-    return String.prototype.replace.call(
-      str, whitespace_both_sides, '');
-  };
-
-  var nth_element_is = function (n, name, array) {
+  function nth_element_is (n, name, array) {
     return name === array[n];
   };
 
-  var get_location = function (gl, fn, program, array) {
+  function get_location (gl, fn, program, array) {
     var name = array[2];
     program[name] = fn.call(gl, program, name);
   };
 
-  exports.set_attrib_positions = function (gl, program, src) {
+  function set_attrib_positions (gl, program, src) {
     var statements = _.map(
-      exports.trim_string(src).split(/;|\n/), function (statement) {
+      utils.trim_string(src).split(/;|\n/), function (statement) {
         return statement.split(/\s+/);
       });
 
@@ -62,16 +56,16 @@ define(function () {
     _.each(attrs, _.bind(get_location, null, gl, gl.getAttribLocation, program));
   };
 
-  exports.create_program = function (gl, vs_src, fs_src) {
-    var vs = exports.compile_shader(gl, vs_src, gl.VERTEX_SHADER);
-    var fs = exports.compile_shader(gl, fs_src, gl.FRAGMENT_SHADER);
+  function create_program (gl, vs_src, fs_src) {
+    var vs = compile_shader(gl, vs_src, gl.VERTEX_SHADER);
+    var fs = compile_shader(gl, fs_src, gl.FRAGMENT_SHADER);
 
-    var program = exports.link_program(gl, vs, fs);
+    var program = link_program(gl, vs, fs);
 
-    exports.set_attrib_positions(gl, program, vs_src + '\n' + fs_src);
+    set_attrib_positions(gl, program, vs_src + '\n' + fs_src);
 
     return program;
   };
 
-  return exports;
+  return named(compile_shader, link_program, set_attrib_positions, create_program);
 });

@@ -7,10 +7,11 @@
 */
 
 
-define(function () {
-  var exports = {};
+define([
+  './named',
+], function (named) {
 
-  exports.zero = function (mat) {
+  function zero (mat) {
     if (mat) {
       for (var i = 0; i < 16; ++i) {
         mat[i] = 0;
@@ -21,8 +22,8 @@ define(function () {
     }
   };
 
-  exports.identity = function (mat) {
-    mat = exports.zero(mat);
+  function identity (mat) {
+    mat = zero(mat);
 
     mat[0]  = 1;
     mat[5]  = 1;
@@ -32,8 +33,8 @@ define(function () {
     return mat;
   };
 
-  exports.frustum = function (width, height, near, far, mat) {
-    mat = exports.zero(mat);
+  function frustum (width, height, near, far, mat) {
+    mat = zero(mat);
 
     mat[0]  = 2 * near / width;
     mat[5]  = 2 * near / height;
@@ -44,7 +45,7 @@ define(function () {
     return mat;
   };
 
-  exports.multiply = function (a, b, mat) {
+  function multiply (a, b, mat) {
     mat = mat || new Float32Array(16);
 
     var i, j, k = 0;
@@ -67,8 +68,8 @@ define(function () {
     return mat;
   };
 
-  exports.scale = function (x, y, z, mat) {
-    mat = mat || exports.identity(mat);
+  function scale (x, y, z, mat) {
+    mat = mat || identity(mat);
 
     mat[0]  *= x;
     mat[5]  *= y;
@@ -77,8 +78,8 @@ define(function () {
     return mat;
   };
 
-  exports.translate = function (x, y, z, mat) {
-    mat = mat || exports.identity();
+  function translate (x, y, z, mat) {
+    mat = mat || identity();
 
     mat[12] += x;
     mat[13] += y;
@@ -87,5 +88,5 @@ define(function () {
     return mat;
   };
 
-  return exports;
+  return named(zero, identity, frustum, multiply, scale, translate);
 });
