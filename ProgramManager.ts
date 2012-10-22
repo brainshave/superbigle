@@ -11,7 +11,7 @@ class ProgramManager {
   private animation: number;
   private canvas: HTMLCanvasElement;
   private gl;
-  
+
   animate() {
     this.current_program.paint(this.gl);
     this.animation = requestAnimationFrame(this.animate);
@@ -62,9 +62,9 @@ class ProgramManager {
     this.current_program = undefined;
   }
 
-  handle_key(event) {
+  handle_key(event: KeyboardEvent) {
     var handler = this.current_program && this.current_program.keys &&
-                  this.current_program.keys[event.keyCode];
+                  this.current_program.keys[event.keyCode.toString()];
     if (typeof handler === 'function') {
       event.preventDefault();
       handler(this.gl, event);

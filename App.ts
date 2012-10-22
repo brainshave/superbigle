@@ -3,6 +3,7 @@
 
 module SuperBigle {
   var manager = new ProgramManager(document.getElementById('put-canvas-here'));
+  window.onkeydown = (event) => manager.handle_key(event);
 
   Menu.gen_menu(document.getElementById('menu'), manager);
 

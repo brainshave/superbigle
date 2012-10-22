@@ -21,7 +21,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="all.js" />
-    <Content Include="app.css" />
+    <TypeScriptCompile Include="chapter_02\Move.ts" />
+    <Content Include="chapter_02\Move.js">
+      <DependentUpon>Move.ts</DependentUpon>
+    </Content>
+    <Content Include="style.css" />
     <TypeScriptCompile Include="chapter_02\Triangle.ts" />
     <Content Include="chapter_02\triangle.js">
       <DependentUpon>Triangle.ts</DependentUpon>
@@ -62,6 +66,7 @@
       <DependentUpon>Utils.ts</DependentUpon>
     </Content>
     <Content Include="web.config" />
+    <Content Include=".gitignore" />
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
