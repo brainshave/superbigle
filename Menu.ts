@@ -1,6 +1,7 @@
 /// <reference path="ProgramManager.ts"/>
 /// <reference path="Chapter_02/Triangle.ts"/>
 /// <reference path="Chapter_02/Move.ts"/>
+/// <reference path="Chapter_02/Bounce.ts"/>
 
 declare var _;
 

@@ -22,6 +22,10 @@
   <ItemGroup>
     <Content Include="all.js" />
     <TypeScriptCompile Include="chapter_02\Move.ts" />
+    <TypeScriptCompile Include="chapter_02\Bounce.ts" />
+    <Content Include="chapter_02\Bounce.js">
+      <DependentUpon>Bounce.ts</DependentUpon>
+    </Content>
     <Content Include="chapter_02\Move.js">
       <DependentUpon>Move.ts</DependentUpon>
     </Content>

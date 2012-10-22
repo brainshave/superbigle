@@ -14,7 +14,7 @@ class ProgramManager {
 
   animate() {
     this.current_program.paint(this.gl);
-    this.animation = requestAnimationFrame(this.animate);
+    this.animation = this.requestAnimationFrame(() => this.animate());
   }
 
   start(program: Program) {
@@ -39,13 +39,13 @@ class ProgramManager {
     this.current_program.start(this.gl);
 
     if (typeof this.current_program.paint === 'function') {
-      this.animation = requestAnimationFrame(this.animate);
+      this.animation = this.requestAnimationFrame(() => this.animate());
     }
   }
 
   stop() {
     if (typeof this.animation !== 'undefined') {
-      cancelAnimationFrame(this.animation);
+      this.cancelAnimationFrame(this.animation);
       this.animation = undefined;
     }
 
