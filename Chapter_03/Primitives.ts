@@ -4,7 +4,7 @@
 /// <reference path="../Matrices.ts" />
 
 module Chapters._03 {
-  var shaders = ['/shaders/flat_vs.c', '/shaders/identity_fs.c'];
+  var shaders = ['../shaders/flat_vs.c', '../shaders/identity_fs.c'];
 
   function create_florida_buffer(gl) {
     // copied from Primitives.cpp
