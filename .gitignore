@@ -1,1 +1,8 @@
-*~
+*.js
+*.sln
+*.config
+*.user
+*.suo
+bin
+obj
+Properties

@@ -1,20 +1,20 @@
-body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    font-family: Arial, sans-serif, sans;
-    color: #999;
+﻿body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif, sans;
+  color: #999;
 }
 
 #menu, #menu ul, #menu li {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 #menu {
-    display: block;
-    position:fixed;
-    right: 10px;
-    top: 10px;
+  display: block;
+  position: fixed;
+  right: 10px;
+  top: 10px;
 }
