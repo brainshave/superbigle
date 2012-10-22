@@ -171,8 +171,8 @@ var Chapters;
 (function (Chapters) {
     (function (_02) {
         var shaders = [
-            '/shaders/identity_vs.c', 
-            '/shaders/identity_fs.c'
+            '../shaders/identity_vs.c', 
+            '../shaders/identity_fs.c'
         ];
         _02._01_Triangle = {
             name: 'Triangle',
@@ -222,8 +222,8 @@ var Chapters;
 (function (Chapters) {
     (function (_02) {
         var shaders = [
-            '/shaders/identity_vs.c', 
-            '/shaders/identity_fs.c'
+            '../shaders/identity_vs.c', 
+            '../shaders/identity_fs.c'
         ];
         var block_size = 0.1;
         var step_size = 0.025;
@@ -322,8 +322,8 @@ var Chapters;
 (function (Chapters) {
     (function (_02) {
         var shaders = [
-            '/shaders/identity_vs.c', 
-            '/shaders/identity_fs.c'
+            '../shaders/identity_vs.c', 
+            '../shaders/identity_fs.c'
         ];
         var block_size = 0.1;
         var step_size = 0.01;
@@ -515,8 +515,8 @@ var Chapters;
 (function (Chapters) {
     (function (_03) {
         var shaders = [
-            '/shaders/flat_vs.c', 
-            '/shaders/identity_fs.c'
+            '../shaders/flat_vs.c', 
+            '../shaders/identity_fs.c'
         ];
         function create_florida_buffer(gl) {
             var verts = new Float32Array([
