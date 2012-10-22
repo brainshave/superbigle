@@ -6,3 +6,5 @@
 bin
 obj
 Properties
+!all.js
+!underscore.js
