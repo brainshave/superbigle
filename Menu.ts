@@ -2,6 +2,7 @@
 /// <reference path="Chapter_02/Triangle.ts"/>
 /// <reference path="Chapter_02/Move.ts"/>
 /// <reference path="Chapter_02/Bounce.ts"/>
+/// <reference path="Chapter_03/Primitives.ts"/>
 
 declare var _;
 

@@ -21,7 +21,7 @@ module Matrices {
     return mat;
   }
 
-  export function frustum(width: number, height: number, near: number, far: number, mat: Float32Array) {
+  export function frustum(width: number, height: number, near: number, far: number, mat?: Float32Array) {
     mat = zero(mat);
 
     mat[0] = 2 * near / width;
@@ -33,7 +33,7 @@ module Matrices {
     return mat;
   }
 
-  export function multiply(a: Float32Array, b: Float32Array, mat: Float32Array) {
+  export function multiply(a: Float32Array, b: Float32Array, mat?: Float32Array) {
     mat = mat || new Float32Array(16);
 
     var i, j, k = 0;
@@ -56,7 +56,7 @@ module Matrices {
     return mat;
   }
 
-  export function scale(x: number, y: number, z: number, mat: Float32Array) {
+  export function scale(x: number, y: number, z: number, mat?: Float32Array) {
     mat = mat || identity(mat);
 
     mat[0] *= x;
@@ -66,7 +66,7 @@ module Matrices {
     return mat;
   }
 
-  export function translate(x: number, y: number, z: number, mat: Float32Array) {
+  export function translate(x: number, y: number, z: number, mat?: Float32Array) {
     mat = mat || identity();
 
     mat[12] += x;

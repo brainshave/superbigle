@@ -21,17 +21,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="all.js" />
-    <TypeScriptCompile Include="chapter_02\Move.ts" />
-    <TypeScriptCompile Include="chapter_02\Bounce.ts" />
-    <Content Include="chapter_02\Bounce.js">
+    <TypeScriptCompile Include="Chapter_02\Move.ts" />
+    <TypeScriptCompile Include="Chapter_02\Bounce.ts" />
+    <Content Include="Chapter_02\Bounce.js">
       <DependentUpon>Bounce.ts</DependentUpon>
     </Content>
-    <Content Include="chapter_02\Move.js">
+    <Content Include="Chapter_02\Move.js">
       <DependentUpon>Move.ts</DependentUpon>
     </Content>
+    <TypeScriptCompile Include="Chapter_03\Primitives.ts" />
+    <Content Include="Chapter_03\Primitives.js">
+      <DependentUpon>Primitives.ts</DependentUpon>
+    </Content>
     <Content Include="style.css" />
-    <TypeScriptCompile Include="chapter_02\Triangle.ts" />
-    <Content Include="chapter_02\triangle.js">
+    <TypeScriptCompile Include="Chapter_02\Triangle.ts" />
+    <Content Include="Chapter_02\triangle.js">
       <DependentUpon>Triangle.ts</DependentUpon>
     </Content>
     <TypeScriptCompile Include="ProgramManager.ts" />
