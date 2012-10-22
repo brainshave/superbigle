@@ -3,7 +3,7 @@
 /// <reference path="../Utils.ts" />
 
 module Chapters._02 {
-  var shaders = ['../shaders/identity_vs.c', '../shaders/identity_fs.c'];
+  var shaders = ['shaders/identity_vs.c', 'shaders/identity_fs.c'];
   var block_size = 0.1, step_size = 0.025;
 
   var program, buffer;
