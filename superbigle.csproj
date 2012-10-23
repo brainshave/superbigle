@@ -33,6 +33,7 @@
     <Content Include="Chapter_03\Primitives.js">
       <DependentUpon>Primitives.ts</DependentUpon>
     </Content>
+    <None Include="README.md" />
     <Content Include="style.css" />
     <TypeScriptCompile Include="Chapter_02\Triangle.ts" />
     <Content Include="Chapter_02\triangle.js">
