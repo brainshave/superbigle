@@ -1,12 +1,13 @@
 /// <reference path="../Program.ts" />
-/// <reference path="../Shaders.ts" />
-/// <reference path="../Utils.ts" />
 
 module Chapters._02 {
-  var shaders = ['shaders/identity_vs.c', 'shaders/identity_fs.c'];
   var block_size = 0.1, step_size = 0.025;
 
-  var program, buffer;
+  var program: Shaders.CompiledProgram;
+  var buffer: WebGLBuffer;
+
+  var vVertex: number;
+  var vColor: WebGLUniformLocation;
 
   var verts = new Float32Array([
     -block_size, -block_size,
@@ -15,9 +16,9 @@ module Chapters._02 {
     -block_size, block_size,
   ]);
 
-  function paint(gl) {
+  function paint(gl: WebGLRenderingContext) {
     gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(program.vVertex, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(vVertex, 2, gl.FLOAT, false, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
   }
@@ -52,22 +53,28 @@ module Chapters._02 {
 
   export var _02_Move: Program = {
     name: 'Move',
+    shaders: {
+      vs: 'shaders/identity_vs.c',
+      fs: 'shaders/identity_fs.c'
+    },
 
-    start: (gl) => {
-      Utils.load_many_txts(shaders, (vs_src, fs_src) => {
-        program = Shaders.create_program(gl, vs_src, fs_src);
-        buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    start: (gl, compiled) => {
+      program = compiled;
 
-        gl.useProgram(program);
-        gl.enableVertexAttribArray(program.vVertex);
+      vVertex = program.attribs['vVertex'];
+      vColor = program.uniforms['vColor'];
 
-        gl.uniform4f(program.vColor, 1, 0.3, 0.3, 1);
-        gl.clearColor(0.3, 0.3, 1, 1);
+      buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
-        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-        paint(gl);
-      });
+      gl.useProgram(program.program);
+      gl.enableVertexAttribArray(vVertex);
+
+      gl.uniform4f(vColor, 1, 0.3, 0.3, 1);
+      gl.clearColor(0.3, 0.3, 1, 1);
+
+      gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+      paint(gl);
     },
 
     stop: () => {
