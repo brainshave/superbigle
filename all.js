@@ -56,65 +56,6 @@ var Utils;
     Utils.load_many_txts = load_many_txts;
 })(Utils || (Utils = {}));
 
-var ProgramManager = (function () {
-    function ProgramManager(canvas_container) {
-        this.canvas_container = canvas_container;
-        this.requestAnimationFrame = Utils.get_prefixed_method(window, 'requestAnimationFrame');
-        this.cancelAnimationFrame = Utils.get_prefixed_method(window, 'cancelAnimationFrame');
-    }
-    ProgramManager.prototype.animate = function () {
-        var _this = this;
-        this.current_program.paint(this.gl);
-        this.animation = this.requestAnimationFrame(function () {
-            return _this.animate();
-        });
-    };
-    ProgramManager.prototype.start = function (program) {
-        var _this = this;
-        if(this.current_program || this.animation || this.canvas || this.gl) {
-            throw new Error("There's a program running: " + this.current_program.name);
-        }
-        if(typeof program.start !== 'function') {
-            throw new Error("Program doesn't have a start method");
-        }
-        this.current_program = program;
-        this.canvas = document.createElement('canvas');
-        this.canvas.setAttribute('width', window.innerWidth.toString());
-        this.canvas.setAttribute('height', window.innerHeight.toString());
-        this.canvas.setAttribute('id', 'canvas');
-        this.canvas_container.appendChild(this.canvas);
-        this.gl = this.canvas.getContext('experimental-webgl');
-        this.current_program.start(this.gl);
-        if(typeof this.current_program.paint === 'function') {
-            this.animation = this.requestAnimationFrame(function () {
-                return _this.animate();
-            });
-        }
-    };
-    ProgramManager.prototype.stop = function () {
-        if(typeof this.animation !== 'undefined') {
-            this.cancelAnimationFrame(this.animation);
-            this.animation = undefined;
-        }
-        if(this.current_program && typeof this.current_program.stop === 'function') {
-            this.current_program.stop();
-        }
-        if(this.canvas) {
-            this.canvas_container.removeChild(this.canvas);
-        }
-        this.canvas = undefined;
-        this.gl = undefined;
-        this.current_program = undefined;
-    };
-    ProgramManager.prototype.handle_key = function (event) {
-        var handler = this.current_program && this.current_program.keys && this.current_program.keys[event.keyCode.toString()];
-        if(typeof handler === 'function') {
-            event.preventDefault();
-            handler(this.gl, event);
-        }
-    };
-    return ProgramManager;
-})();
 var Shaders;
 (function (Shaders) {
     function compile_shader(gl, src, type) {
@@ -140,77 +81,156 @@ var Shaders;
         }
     }
     Shaders.link_program = link_program;
-    function nth_element_is(n, name, array) {
-        return name === array[n];
-    }
-    ; ;
-    function get_location(gl, fn, program, array) {
-        var name = array[2];
-        program[name] = fn.call(gl, program, name);
-    }
-    function set_attrib_positions(gl, program, src) {
-        var statements = _.map(Utils.trim_string(src).split(/;|\n/), function (statement) {
+    function get_statements(src) {
+        return _.map(Utils.trim_string(src).split(/;|\n/), function (statement) {
             return statement.split(/\s+/);
         });
-        var uniforms = _.filter(statements, _.bind(nth_element_is, null, 0, 'uniform'));
-        var attrs = _.filter(statements, _.bind(nth_element_is, null, 0, 'attribute'));
-        _.each(uniforms, _.bind(get_location, null, gl, gl.getUniformLocation, program));
-        _.each(attrs, _.bind(get_location, null, gl, gl.getAttribLocation, program));
     }
-    function create_program(gl, vs_src, fs_src) {
-        var vs = compile_shader(gl, vs_src, gl.VERTEX_SHADER);
-        var fs = compile_shader(gl, fs_src, gl.FRAGMENT_SHADER);
-        var program = link_program(gl, vs, fs);
-        set_attrib_positions(gl, program, vs_src + '\n' + fs_src);
-        return program;
-    }
-    Shaders.create_program = create_program;
+    var CompiledProgram = (function () {
+        function CompiledProgram(gl, vs_src, fs_src) {
+            this.gl = gl;
+            this.uniforms = {
+            };
+            this.attribs = {
+            };
+            var vs = compile_shader(gl, vs_src, gl.VERTEX_SHADER);
+            var fs = compile_shader(gl, fs_src, gl.FRAGMENT_SHADER);
+            this.program = link_program(gl, vs, fs);
+            this.set_locations(vs_src + '\n' + fs_src);
+        }
+        CompiledProgram.prototype.set_locations = function (src) {
+            var statements = get_statements(src);
+            var uniforms = statements.filter(function (stmt) {
+                return stmt[0] === 'uniform';
+            });
+            var attrs = statements.filter(function (stmt) {
+                return stmt[0] === 'attribute';
+            });
+            var i;
+            var name;
+
+            for(i = 0; i < uniforms.length; ++i) {
+                name = uniforms[i][2];
+                this.uniforms[name] = this.gl.getUniformLocation(this.program, name);
+            }
+            for(i = 0; i < attrs.length; ++i) {
+                name = attrs[i][2];
+                this.attribs[name] = this.gl.getAttribLocation(this.program, name);
+            }
+        };
+        return CompiledProgram;
+    })();
+    Shaders.CompiledProgram = CompiledProgram;    
 })(Shaders || (Shaders = {}));
 
+var ProgramManager = (function () {
+    function ProgramManager(canvas_container) {
+        this.canvas_container = canvas_container;
+        this.requestAnimationFrame = Utils.get_prefixed_method(window, 'requestAnimationFrame');
+        this.cancelAnimationFrame = Utils.get_prefixed_method(window, 'cancelAnimationFrame');
+    }
+    ProgramManager.prototype.animate = function () {
+        var _this = this;
+        this.current_program.paint(this.gl);
+        this.animation = this.requestAnimationFrame(function () {
+            return _this.animate();
+        });
+    };
+    ProgramManager.prototype.start = function (program) {
+        var _this = this;
+        if(this.current_program || this.animation || this.canvas || this.gl) {
+            throw new Error("There's a program running: " + this.current_program.name);
+        }
+        if(typeof program.start !== 'function') {
+            throw new Error("Program doesn't have a start method");
+        }
+        Utils.load_many_txts([
+            program.shaders.vs, 
+            program.shaders.fs
+        ], function (vs_src, fs_src) {
+            _this.current_program = program;
+            _this.canvas = document.createElement('canvas');
+            _this.canvas.setAttribute('width', window.innerWidth.toString());
+            _this.canvas.setAttribute('height', window.innerHeight.toString());
+            _this.canvas.setAttribute('id', 'canvas');
+            _this.canvas_container.appendChild(_this.canvas);
+            _this.gl = _this.canvas.getContext('experimental-webgl');
+            var compiled = new Shaders.CompiledProgram(_this.gl, vs_src, fs_src);
+            _this.current_program.start(_this.gl, compiled);
+            if(typeof _this.current_program.paint === 'function') {
+                _this.animation = _this.requestAnimationFrame(function () {
+                    return _this.animate();
+                });
+            }
+        });
+    };
+    ProgramManager.prototype.stop = function () {
+        if(typeof this.animation !== 'undefined') {
+            this.cancelAnimationFrame(this.animation);
+            this.animation = undefined;
+        }
+        if(this.current_program && typeof this.current_program.stop === 'function') {
+            this.current_program.stop();
+        }
+        if(this.canvas) {
+            this.canvas_container.removeChild(this.canvas);
+        }
+        this.canvas = undefined;
+        this.gl = undefined;
+        this.current_program = undefined;
+    };
+    ProgramManager.prototype.handle_key = function (event) {
+        var handler = this.current_program && this.current_program.keys && this.current_program.keys[event.keyCode.toString()];
+        if(typeof handler === 'function') {
+            event.preventDefault();
+            handler(this.gl, event);
+        }
+    };
+    return ProgramManager;
+})();
 var Chapters;
 (function (Chapters) {
     (function (_02) {
-        var shaders = [
-            'shaders/identity_vs.c', 
-            'shaders/identity_fs.c'
-        ];
+        function create_triangle_buffer(gl) {
+            var verts = new Float32Array([
+                -0.5, 
+                0, 
+                0, 
+                1, 
+                0.5, 
+                0, 
+                0, 
+                1, 
+                0, 
+                0.5, 
+                0, 
+                1, 
+                
+            ]);
+            var buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+            return buffer;
+        }
+        ; ;
         _02._01_Triangle = {
             name: 'Triangle',
-            create_triangle_buffer: function (gl) {
-                var verts = new Float32Array([
-                    -0.5, 
-                    0, 
-                    0, 
-                    1, 
-                    0.5, 
-                    0, 
-                    0, 
-                    1, 
-                    0, 
-                    0.5, 
-                    0, 
-                    1, 
-                    
-                ]);
-                var buffer = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-                gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
-                return buffer;
+            shaders: {
+                vs: 'shaders/identity_vs.c',
+                fs: 'shaders/identity_fs.c'
             },
-            start: function (gl) {
-                var _this = this;
-                Utils.load_many_txts(shaders, function (vs_src, fs_src) {
-                    var program = Shaders.create_program(gl, vs_src, fs_src);
-                    var buffer = _this.create_triangle_buffer(gl);
-                    gl.useProgram(program);
-                    gl.enableVertexAttribArray(program.vVertex);
-                    gl.uniform4f(program.vColor, 1, 0.3, 0.3, 1);
-                    gl.clearColor(0.3, 0.3, 1, 1);
-                    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-                    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                    gl.vertexAttribPointer(program.vVertex, 4, gl.FLOAT, false, 0, 0);
-                    gl.drawArrays(gl.TRIANGLE_FAN, 0, 3);
-                });
+            start: function (gl, program) {
+                var buffer = create_triangle_buffer(gl);
+                var vVertex = program.attribs['vVertex'];
+                var vColor = program.uniforms['vColor'];
+                gl.useProgram(program.program);
+                gl.enableVertexAttribArray(vVertex);
+                gl.uniform4f(vColor, 1, 0.3, 0.3, 1);
+                gl.clearColor(0.3, 0.3, 1, 1);
+                gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                gl.vertexAttribPointer(vVertex, 4, gl.FLOAT, false, 0, 0);
+                gl.drawArrays(gl.TRIANGLE_FAN, 0, 3);
             }
         };
     })(Chapters._02 || (Chapters._02 = {}));
@@ -221,16 +241,13 @@ var Chapters;
 var Chapters;
 (function (Chapters) {
     (function (_02) {
-        var shaders = [
-            'shaders/identity_vs.c', 
-            'shaders/identity_fs.c'
-        ];
         var block_size = 0.1;
         var step_size = 0.025;
 
         var program;
         var buffer;
-
+        var vVertex;
+        var vColor;
         var verts = new Float32Array([
             -block_size, 
             -block_size, 
@@ -244,7 +261,7 @@ var Chapters;
         ]);
         function paint(gl) {
             gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(program.vVertex, 2, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(vVertex, 2, gl.FLOAT, false, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
         }
@@ -289,18 +306,22 @@ var Chapters;
         }
         _02._02_Move = {
             name: 'Move',
-            start: function (gl) {
-                Utils.load_many_txts(shaders, function (vs_src, fs_src) {
-                    program = Shaders.create_program(gl, vs_src, fs_src);
-                    buffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-                    gl.useProgram(program);
-                    gl.enableVertexAttribArray(program.vVertex);
-                    gl.uniform4f(program.vColor, 1, 0.3, 0.3, 1);
-                    gl.clearColor(0.3, 0.3, 1, 1);
-                    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-                    paint(gl);
-                });
+            shaders: {
+                vs: 'shaders/identity_vs.c',
+                fs: 'shaders/identity_fs.c'
+            },
+            start: function (gl, compiled) {
+                program = compiled;
+                vVertex = program.attribs['vVertex'];
+                vColor = program.uniforms['vColor'];
+                buffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+                gl.useProgram(program.program);
+                gl.enableVertexAttribArray(vVertex);
+                gl.uniform4f(vColor, 1, 0.3, 0.3, 1);
+                gl.clearColor(0.3, 0.3, 1, 1);
+                gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+                paint(gl);
             },
             stop: function () {
                 program = null;
@@ -321,10 +342,6 @@ var Chapters;
 var Chapters;
 (function (Chapters) {
     (function (_02) {
-        var shaders = [
-            'shaders/identity_vs.c', 
-            'shaders/identity_fs.c'
-        ];
         var block_size = 0.1;
         var step_size = 0.01;
 
@@ -334,7 +351,8 @@ var Chapters;
         var max_xy = 1 - block_size * 2;
         var program;
         var buffer;
-
+        var vVertex;
+        var vColor;
         var verts = new Float32Array([
             -block_size, 
             -block_size, 
@@ -405,28 +423,32 @@ var Chapters;
         var valid = false;
         _02._03_Bounce = {
             name: 'Bounce',
+            shaders: {
+                vs: 'shaders/identity_vs.c',
+                fs: 'shaders/identity_fs.c'
+            },
             paint: function (gl) {
                 if(!valid) {
                     return;
                 }
                 bounce();
                 gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
-                gl.vertexAttribPointer(program.vVertex, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(vVertex, 2, gl.FLOAT, false, 0, 0);
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
                 gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
             },
-            start: function (gl) {
-                Utils.load_many_txts(shaders, function (vs_src, fs_src) {
-                    valid = true;
-                    program = Shaders.create_program(gl, vs_src, fs_src);
-                    buffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-                    gl.useProgram(program);
-                    gl.enableVertexAttribArray(program.vVertex);
-                    gl.uniform4f(program.vColor, 1, 0.3, 0.3, 1);
-                    gl.clearColor(0.3, 0.3, 1, 1);
-                    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-                });
+            start: function (gl, compiled) {
+                program = compiled;
+                valid = true;
+                buffer = gl.createBuffer();
+                vVertex = program.attribs['vVertex'];
+                vColor = program.uniforms['vColor'];
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+                gl.useProgram(program.program);
+                gl.enableVertexAttribArray(vVertex);
+                gl.uniform4f(vColor, 1, 0.3, 0.3, 1);
+                gl.clearColor(0.3, 0.3, 1, 1);
+                gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
             },
             stop: function () {
                 valid = false;
@@ -514,10 +536,6 @@ var Matrices;
 var Chapters;
 (function (Chapters) {
     (function (_03) {
-        var shaders = [
-            'shaders/flat_vs.c', 
-            'shaders/identity_fs.c'
-        ];
         function create_florida_buffer(gl) {
             var verts = new Float32Array([
                 2.8, 
@@ -601,22 +619,26 @@ var Chapters;
         ; ;
         _03._01_Primitives = {
             name: 'Primitives',
-            start: function (gl) {
-                Utils.load_many_txts(shaders, function (vs_src, fs_src) {
-                    var program = Shaders.create_program(gl, vs_src, fs_src);
-                    var florida = create_florida_buffer(gl);
-                    var p = Matrices.frustum(5 * gl.drawingBufferWidth / gl.drawingBufferHeight, 5, 3, 500);
-                    var mv = Matrices.scale(-1, 1, 1, Matrices.translate(0, 0, 4));
-                    var mvp = Matrices.multiply(p, mv);
-                    gl.useProgram(program);
-                    gl.enableVertexAttribArray(program.vVertex);
-                    gl.uniform4f(program.vColor, 0, 0, 0, 1);
-                    gl.clearColor(1, 1, 1, 1);
-                    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-                    gl.vertexAttribPointer(program.vVertex, 3, gl.FLOAT, false, 0, 0);
-                    gl.uniformMatrix4fv(program.mvpMatrix, false, mvp);
-                    gl.drawArrays(gl.LINE_LOOP, 0, 24);
-                });
+            shaders: {
+                vs: 'shaders/flat_vs.c',
+                fs: 'shaders/identity_fs.c'
+            },
+            start: function (gl, program) {
+                var florida = create_florida_buffer(gl);
+                var p = Matrices.frustum(5 * gl.drawingBufferWidth / gl.drawingBufferHeight, 5, 3, 500);
+                var mv = Matrices.scale(-1, 1, 1, Matrices.translate(0, 0, 4));
+                var mvp = Matrices.multiply(p, mv);
+                var vVertex = program.attribs['vVertex'];
+                var vColor = program.uniforms['vColor'];
+                var mvpMatrix = program.uniforms['mvpMatrix'];
+                gl.useProgram(program.program);
+                gl.enableVertexAttribArray(vVertex);
+                gl.uniform4f(vColor, 0, 0, 0, 1);
+                gl.clearColor(1, 1, 1, 1);
+                gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+                gl.vertexAttribPointer(vVertex, 3, gl.FLOAT, false, 0, 0);
+                gl.uniformMatrix4fv(mvpMatrix, false, mvp);
+                gl.drawArrays(gl.LINE_LOOP, 0, 24);
             }
         };
     })(Chapters._03 || (Chapters._03 = {}));
@@ -681,3 +703,4 @@ var SuperBigle;
     }
 })(SuperBigle || (SuperBigle = {}));
 
+//@ sourceMappingURL=all.js.map
