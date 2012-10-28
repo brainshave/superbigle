@@ -1,11 +1,8 @@
 /// <reference path="../Program.ts" />
 /// <reference path="../Shaders.ts" />
-/// <reference path="../Utils.ts" />
 /// <reference path="../Matrices.ts" />
 
 module Chapters._03 {
-  var shaders = ['shaders/flat_vs.c', 'shaders/identity_fs.c'];
-
   function create_florida_buffer(gl) {
     // copied from Primitives.cpp
     var verts = new Float32Array([
@@ -31,28 +28,33 @@ module Chapters._03 {
 
   export var _01_Primitives: Program = {
     name: 'Primitives',
+    shaders: {
+      vs: 'shaders/flat_vs.c',
+      fs: 'shaders/identity_fs.c'
+    },
 
-    start: (gl) => {
-      Utils.load_many_txts(shaders, (vs_src, fs_src) => {
-        var program = Shaders.create_program(gl, vs_src, fs_src);
-        var florida = create_florida_buffer(gl);
-        var p = Matrices.frustum(5 * gl.drawingBufferWidth / gl.drawingBufferHeight, 5, 3, 500);
-        var mv = Matrices.scale(-1, 1, 1, Matrices.translate(0, 0, 4));
-        var mvp = Matrices.multiply(p, mv);
+    start: (gl, program) => {
+      var florida = create_florida_buffer(gl);
+      var p = Matrices.frustum(5 * gl.drawingBufferWidth / gl.drawingBufferHeight, 5, 3, 500);
+      var mv = Matrices.scale(-1, 1, 1, Matrices.translate(0, 0, 4));
+      var mvp = Matrices.multiply(p, mv);
 
-        gl.useProgram(program);
-        gl.enableVertexAttribArray(program.vVertex);
+      var vVertex = program.attribs['vVertex'];
+      var vColor = program.uniforms['vColor'];
+      var mvpMatrix = program.uniforms['mvpMatrix'];
 
-        gl.uniform4f(program.vColor, 0, 0, 0, 1);
-        gl.clearColor(1, 1, 1, 1);
+      gl.useProgram(program.program);
+      gl.enableVertexAttribArray(vVertex);
 
-        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-        gl.vertexAttribPointer(program.vVertex, 3, gl.FLOAT, false, 0, 0);
+      gl.uniform4f(vColor, 0, 0, 0, 1);
+      gl.clearColor(1, 1, 1, 1);
 
-        gl.uniformMatrix4fv(program.mvpMatrix, false, mvp);
+      gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+      gl.vertexAttribPointer(vVertex, 3, gl.FLOAT, false, 0, 0);
 
-        gl.drawArrays(gl.LINE_LOOP, 0, 24);
-      });
+      gl.uniformMatrix4fv(mvpMatrix, false, mvp);
+
+      gl.drawArrays(gl.LINE_LOOP, 0, 24);
     }
   }
 }

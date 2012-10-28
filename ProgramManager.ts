@@ -1,5 +1,6 @@
 /// <reference path="Utils.ts"/>
 /// <reference path="Program.ts"/>
+/// <reference path="WebGL.d.ts"/>
 
 class ProgramManager {
   constructor (private canvas_container: HTMLElement) { }
@@ -10,7 +11,7 @@ class ProgramManager {
   private current_program: Program;
   private animation: number;
   private canvas: HTMLCanvasElement;
-  private gl;
+  private gl: WebGLRenderingContext;
 
   animate() {
     this.current_program.paint(this.gl);
@@ -26,21 +27,25 @@ class ProgramManager {
       throw new Error("Program doesn't have a start method");
     }
 
-    this.current_program = program;
+    Utils.load_many_txts([program.shaders.vs, program.shaders.fs], (vs_src, fs_src) => {
+      this.current_program = program;
 
-    this.canvas = <HTMLCanvasElement> document.createElement('canvas');
-    this.canvas.setAttribute('width', window.innerWidth.toString());
-    this.canvas.setAttribute('height', window.innerHeight.toString());
-    this.canvas.setAttribute('id', 'canvas');
-    this.canvas_container.appendChild(this.canvas);
+      this.canvas = <HTMLCanvasElement> document.createElement('canvas');
+      this.canvas.setAttribute('width', window.innerWidth.toString());
+      this.canvas.setAttribute('height', window.innerHeight.toString());
+      this.canvas.setAttribute('id', 'canvas');
+      this.canvas_container.appendChild(this.canvas);
 
-    this.gl = this.canvas.getContext('experimental-webgl');
+      this.gl = <any> this.canvas.getContext('experimental-webgl');
 
-    this.current_program.start(this.gl);
+      var compiled = new Shaders.CompiledProgram(this.gl, vs_src, fs_src);
 
-    if (typeof this.current_program.paint === 'function') {
-      this.animation = this.requestAnimationFrame(() => this.animate());
-    }
+      this.current_program.start(this.gl, compiled);
+
+      if (typeof this.current_program.paint === 'function') {
+        this.animation = this.requestAnimationFrame(() => this.animate());
+      }
+    });
   }
 
   stop() {
