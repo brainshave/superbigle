@@ -21,6 +21,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="all.js" />
+    <TypeScriptCompile Include="idltots.ts" />
+    <Content Include="idltots.js">
+      <DependentUpon>idltots.ts</DependentUpon>
+    </Content>
+    <Content Include="node.d.ts" />
+    <Content Include="underscore-1.4.d.ts" />
+    <Content Include="webgl.idl" />
     <TypeScriptCompile Include="Chapter_02\Move.ts" />
     <TypeScriptCompile Include="Chapter_02\Bounce.ts" />
     <Content Include="Chapter_02\Bounce.js">
@@ -134,6 +141,10 @@
     <Exec Command="&quot;$(PROGRAMFILES)\Microsoft SDKs\TypeScript\0.8.0.0\tsc&quot; @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>tsc.cmd --out $(SolutionDir)all.js $(SolutionDir)App.ts</PostBuildEvent>
+    <PostBuildEvent>tsc.cmd -sourcemap --out $(SolutionDir)all.js $(SolutionDir)App.ts</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>
