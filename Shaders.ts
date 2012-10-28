@@ -1,9 +1,9 @@
 /// <reference path="Utils.ts"/>
-
-declare var _;
+/// <reference path="WebGL.d.ts"/>
+/// <reference path="underscore-1.4.d.ts" />
 
 module Shaders {
-  export function compile_shader(gl, src, type) {
+  export function compile_shader(gl: WebGLRenderingContext, src: string, type: number) {
     var shader = gl.createShader(type);
     gl.shaderSource(shader, src);
     gl.compileShader(shader);
@@ -11,12 +11,11 @@ module Shaders {
     if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
       return shader;
     } else {
-      throw new Error('Shader compile error:\n' +
-                      gl.getShaderInfoLog(shader));
+      throw new Error('Shader compile error:\n' + gl.getShaderInfoLog(shader));
     }
   }
 
-  export function link_program(gl, vs, fs) {
+  export function link_program(gl: WebGLRenderingContext, vs: WebGLShader, fs: WebGLShader) {
     var program = gl.createProgram();
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
@@ -29,40 +28,41 @@ module Shaders {
                       gl.getProgramInfoLog(program));
     }
   }
-
-  function nth_element_is(n, name, array) {
-    return name === array[n];
-  };
-
-  function get_location(gl, fn, program, array) {
-    var name = array[2];
-    program[name] = fn.call(gl, program, name);
+  
+  function get_statements(src: string): string[][] {
+    return _.map(Utils.trim_string(src).split(/;|\n/), (statement: string) => statement.split(/\s+/));
   }
 
-  function set_attrib_positions(gl, program, src) {
-    var statements = _.map(
-      Utils.trim_string(src).split(/;|\n/), function (statement) {
-        return statement.split(/\s+/);
-      });
+  export class CompiledProgram {
+    program: WebGLProgram;
+    uniforms: { [index: string]: WebGLUniformLocation; } = {};
+    attribs: { [index: string]: number; } = {};
 
-    var uniforms = _.filter(
-      statements, _.bind(nth_element_is, null, 0, 'uniform'));
+    constructor (private gl: WebGLRenderingContext, vs_src: string, fs_src: string) {
+      var vs = compile_shader(gl, vs_src, gl.VERTEX_SHADER);
+      var fs = compile_shader(gl, fs_src, gl.FRAGMENT_SHADER);
 
-    var attrs = _.filter(
-      statements, _.bind(nth_element_is, null, 0, 'attribute'));
+      this.program = link_program(gl, vs, fs);
 
-    _.each(uniforms, _.bind(get_location, null, gl, gl.getUniformLocation, program));
-    _.each(attrs, _.bind(get_location, null, gl, gl.getAttribLocation, program));
-  }
+      this.set_locations(vs_src + '\n' + fs_src);
+    }
 
-  export function create_program(gl, vs_src, fs_src) {
-    var vs = compile_shader(gl, vs_src, gl.VERTEX_SHADER);
-    var fs = compile_shader(gl, fs_src, gl.FRAGMENT_SHADER);
+    private set_locations(src: string) {
+      var statements = get_statements(src);
+      
+      var uniforms = statements.filter((stmt) => stmt[0] === 'uniform');
+      var attrs = statements.filter((stmt) => stmt[0] === 'attribute');
 
-    var program = link_program(gl, vs, fs);
+      var i, name;
+      for (i = 0; i < uniforms.length; ++i) {
+        name = uniforms[i][2];
+        this.uniforms[name] = this.gl.getUniformLocation(this.program, name);
+      }
 
-    set_attrib_positions(gl, program, vs_src + '\n' + fs_src);
-
-    return program;
+      for (i = 0; i < attrs.length; ++i) {
+        name = attrs[i][2];
+        this.attribs[name] = this.gl.getAttribLocation(this.program, name);
+      }
+    }
   }
 }
