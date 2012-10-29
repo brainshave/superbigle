@@ -62,10 +62,10 @@ ts = ts
 // 1. adding a unique field 
 // 2. translating to declare class
 
-//ts = ts.replace(/interface([^{]+)\{(\s*)\}/g, (str, signature) => 
-//    'interface' + signature + '{\n    __' + (signature.replace(/\s+/g, '_')) + ': any;\n}')
+ts = ts.replace(/interface([^{]+)\{(\s*)\}/g, (str, signature) => 
+    'interface' + signature + '{\n    __' + (signature.replace(/\s+/g, '_')) + ': any;\n}')
 
-ts = ts.replace(/interface([^{]+)\{(\s*)\}/g, 'declare class$1{$2}');
+//ts = ts.replace(/interface([^{]+)\{(\s*)\}/g, 'declare class$1{$2}');
 
 // Optional cleanup
 ts = ts

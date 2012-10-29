@@ -7,28 +7,36 @@ interface WebGLContextAttributes {
     preserveDrawingBuffer: bool;
 };
 
-declare class WebGLObject {
+interface WebGLObject {
+    ___WebGLObject_: any;
 };
 
-declare class WebGLBuffer extends WebGLObject {
+interface WebGLBuffer extends WebGLObject {
+    ___WebGLBuffer_extends_WebGLObject_: any;
 };
 
-declare class WebGLFramebuffer extends WebGLObject {
+interface WebGLFramebuffer extends WebGLObject {
+    ___WebGLFramebuffer_extends_WebGLObject_: any;
 };
 
-declare class WebGLProgram extends WebGLObject {
+interface WebGLProgram extends WebGLObject {
+    ___WebGLProgram_extends_WebGLObject_: any;
 };
 
-declare class WebGLRenderbuffer extends WebGLObject {
+interface WebGLRenderbuffer extends WebGLObject {
+    ___WebGLRenderbuffer_extends_WebGLObject_: any;
 };
 
-declare class WebGLShader extends WebGLObject {
+interface WebGLShader extends WebGLObject {
+    ___WebGLShader_extends_WebGLObject_: any;
 };
 
-declare class WebGLTexture extends WebGLObject {
+interface WebGLTexture extends WebGLObject {
+    ___WebGLTexture_extends_WebGLObject_: any;
 };
 
-declare class WebGLUniformLocation {
+interface WebGLUniformLocation {
+    ___WebGLUniformLocation_: any;
 };
 
 interface WebGLActiveInfo {
