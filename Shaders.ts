@@ -1,5 +1,4 @@
 /// <reference path="Utils.ts"/>
-/// <reference path="WebGL.d.ts"/>
 /// <reference path="underscore-1.4.d.ts" />
 
 module Shaders {

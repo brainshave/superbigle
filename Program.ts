@@ -6,5 +6,5 @@ interface Program {
   start(gl: WebGLRenderingContext, compiled_program: Shaders.CompiledProgram): void;
   stop? (): void;
   paint? (gl: WebGLRenderingContext): void;
-  keys?: { [index]: (gl: WebGLRenderingContext, event: KeyboardEvent) => void; };
+  keys?: { [index:string]: (gl: WebGLRenderingContext, event: KeyboardEvent) => void; };
 }
