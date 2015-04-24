@@ -1,6 +1,5 @@
 /// <reference path="Utils.ts"/>
 /// <reference path="Program.ts"/>
-/// <reference path="WebGL.d.ts"/>
 
 class ProgramManager {
   constructor (private canvas_container: HTMLElement) { }

@@ -4,7 +4,7 @@
 /// <reference path="Chapter_02/Bounce.ts"/>
 /// <reference path="Chapter_03/Primitives.ts"/>
 
-declare var _;
+declare var _:UnderscoreStatic;
 
 module Menu {
   function program_starter(manager: ProgramManager, program: Program) {
